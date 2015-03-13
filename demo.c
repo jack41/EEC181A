@@ -1,6 +1,7 @@
 // converting roi.m to roi.c
 #pragma warning (disable : 4996)
 # include <stdio.h>
+# include <math.h>
 # include "img2.h"
 # include "demo.h"
 
@@ -25,50 +26,10 @@ int nn[784][1];
 int Z3[10][1];
 int answer=0;
 
-void resize(int width, int height)
-{
-	//int img[][]; 
-	//assume this is our image
-
-	//find the height of the image;
-
-
-	//calculate the scale factor
-	double scaleWidth =(double) 28 / width;
-	double scaleHeight =(double) 28 / height;
-
-	
-
-	//initialize the 2d array with 0
-	int i, j;
-	for (i = 0; i<28; i++)
-	{
-		for (j = 0; j<28; j++)
-		{
-			output[i][j] = 0;
-		}
-	}
-
-	//calculate the max index for the for loop
-	double widthMax = scaleWidth*width;
-	double heightMax = scaleHeight*height;
-
-	//value to store the index
-	int x;
-	int y;
-	for (i = 1; i<heightMax; i++)
-	{
-		for (j = 1; j<widthMax; j++)
-		{
-			x = round((i - 1)*(height - 1) / (scaleHeight*height - 1) + 1);
-			y = round((j - 1)*(width - 1) / (scaleWidth*width - 1) + 1);
-
-			//output will have the 28x28 dimensions of the image
-			output[i][j] = ROIimg[x][y];
-		}
-	}
-
-}
+//void resize(int width, int height, int )
+//{
+//
+//}
 
 void NeuralNetwork()
 {
@@ -308,22 +269,110 @@ int main(){
 	int sizeCol = cols_index_end - cols_index_beg;
 	int sizeRow = rows_index_end - rows_index_beg;
 
+	int **ROI;
+	//dynamically allocate memory for ROI
+	ROI = (int **)malloc(sizeof(int *)*sizeRow);
+
+	// for each row, malloc space for its buckets and add it to 
+	// the array of arrays
+	for (i = 0; i < sizeRow; i++) {
+		ROI[i] = (int *)malloc(sizeof(int)*sizeCol);
+	}
 	
-	
-	//
+	//initialze it to 0
+	for (i = 0; i < sizeRow; i++) {
+		for (j = 0; j < sizeCol; j++) {
+			ROI[i][j] = 0;
+		}
+	}
+
+/******************************************************************************************************************/
+//store the ROI into the dynamically allocated 2d array (pointer to pointer)
 	for (i = cols_index_beg; i<cols_index_end; i++)
 	{
 		for (j = rows_index_beg; j<rows_index_end; j++)
 		{
-			ROIimg[j - rows_index_beg][i - cols_index_beg] = img[j][i];
+			ROI[j - rows_index_beg][i - cols_index_beg] = img[j][i];
 		}
-		int mmm = 0;
 	}
 
-	resize(sizeCol, sizeRow);
-	int nm = 0;
-	NeuralNetwork();
-	printf("%d", answer);
 
+	//FILE *fptr;
+	//fptr = fopen("./output.txt", "w");
+	//if (fptr == NULL)
+	//{
+	//	printf("ERROR!");
+	//	exit(1);
+	//}
+	//
+	//for (i = 0; i < sizeRow; i++)
+	//{
+	//	for (int j = 0; j < sizeCol; j++)
+	//	{
+	//		fprintf(fptr, "%d\n", ROI[i][j]);
+	//	}
+	//}
+	//
+	//fclose(fptr);
+
+
+	//resize(sizeCol, sizeRow);
+
+
+
+	//int img[][]; 
+	//assume this is our image
+
+	//find the height of the image;
+
+	int width = sizeCol;
+	int height = sizeRow;
+
+	//calculate the scale factor
+	double scaleWidth = (double)28 / width;
+	double scaleHeight = (double)28 / height;
+
+
+
+	//initialize the 2d array with 0
+	int i, j;
+	for (i = 0; i<28; i++)
+	{
+		for (j = 0; j<28; j++)
+		{
+			output[i][j] = 0;
+		}
+	}
+
+	//calculate the max index for the for loop
+	double widthMax = scaleWidth*width;
+	double heightMax = scaleHeight*height;
+
+	//value to store the index
+	int x;
+	int y;
+	for (i = 0; i<28; i++)
+	{
+		for (j = 0; j<28; j++)
+		{
+			//x = round((i - 1)*(height - 1) / (scaleHeight*height - 1) + 1);
+			//y = round((j - 1)*(width - 1) / (scaleWidth*width - 1) + 1);
+
+			x = round((i*(height - 1) / 27));
+			y = round((j*(width - 1) / 27) );
+			//output will have the 28x28 dimensions of the image
+			output[i][j] = ROI[x][y];
+		}
+	}
+
+	//int nm = 0;
+	NeuralNetwork();
+
+	//printf("%d", ROI[220][222]);
+	//for (i = 0; i < 28; i++){
+	//	printf(" ");
+		printf("%d ", output[8][8]);
+	//}
+	
 	return 0;
 }
