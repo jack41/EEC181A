@@ -21,9 +21,9 @@ int i = 0, j = 0;
 int ROIimg[221][223];
 //delcare a 28x28 2d array
 int output[28][28];
-int nn[784][1];
+int nn[784];
 
-int Z3[10][1];
+double Z3[10];
 int answer=0;
 
 //void resize(int width, int height, int )
@@ -34,36 +34,25 @@ int answer=0;
 void NeuralNetwork()
 {
 	int i, j, k;
-	int sum;
-	int Z1[200][1];
-	int Z2[200][1];
+	double sum;
+	double Z1[200];
+	double Z2[200];
 	
-
-	//convert the 28x28 into 784 x1
-	for (i = 0; i < 28; i++)
-	{
-		for (j = 0; j < 28; j++)
-		{
-			nn[i * 28 + j][1] =output[j][i];
-		}
-		int y = 0;
-	}
-
 	//apply the weight 1
 	//Multiplication Logic
-	for (i = 0; i < 200; i++) {
-		for (j = 0; j < 1; j++) {
+	for (i = 0; i < 200; i++) 
+	{
 			sum = 0;
 			for (k = 0; k < 784; k++) {
-				sum = sum + W1[i][k] * nn[k][j];
+				sum = sum + W1[i][k] * nn[k];
 			}
-			Z1[i][j] = sum;
-		}
+			Z1[i] = sum;
+		
 	}
 
 	for (j = 0; j < 200; j++)
 	{
-		Z1[j][1] = Z1[j][1] + B1[j];
+		Z1[j] = Z1[j] + B1[j];
 	}
 
 
@@ -71,55 +60,56 @@ void NeuralNetwork()
 	//
 	for (i = 0; i < 200; i++)
 	{
-		temp = exp(Z1[i][1]);
-		Z1[i][1] = 1 / (1 + temp);
+		temp = exp(-Z1[i]);
+		Z1[i] = 1 / (1 + temp);
 	}
 
 	//apply weight 2
 	//Multiplication Logic
 	for (i = 0; i < 200; i++) {
-		for (j = 0; j < 1; j++) {
+	
 			sum = 0;
-			for (k = 0; k <= 200; k++) {
-				sum = sum + W2[i][k] * Z1[k][j];
+			for (k = 0; k < 200; k++) {
+				sum = sum + W2[i][k] * Z1[k];
 			}
-			Z2[i][j] = sum;
-		}
+			Z2[i] = sum;
+	
 	}
 
 	for (i = 0; i< 200; i++)
 	{
-		Z2[i][1] = Z2[i][1] + B2[i];
+		Z2[i] = Z2[i] + B2[i];
 	}
 
 	for (i = 0; i < 200; i++)
 	{
-		temp = exp(Z2[i][1]);
-		Z2[i][1] = 1 / (1 + temp);
+		temp = exp(-Z2[i]);
+		Z2[i] = 1 / (1 + temp);
 	}
 
 	//apply weight 3
 	//Multiplication Logic
 	for (i = 0; i < 10; i++) {
-		for (j = 0; j < 1; j++) {
+	
 			sum = 0;
-			for (k = 0; k <= 200; k++) {
-				sum = sum + W3[i][k] * Z2[k][j];
+			for (k = 0; k < 200; k++) {
+				sum = sum + W3[i][k] * Z2[k];
 			}
-			Z3[i][j] = sum;
-		}
+			Z3[i] = sum;
+		
 	}
 
-	int max = Z3[0][1];
-
+	int max = Z3[0];
+	
 	for (i = 0; i < 10; ++i)
 	{
-		if (Z3[i][1] > max)
+		if (Z3[i] > max)
 		{
-			max = (int)Z3[i][1];
-			answer = i;
+			max = Z3[i];
+			answer = i+1; //add one to the index because the index starts with 0
 		}
 	}
+
 	
 }
 
@@ -365,14 +355,68 @@ int main(){
 		}
 	}
 
-	//int nm = 0;
+
+	//convert the 28x28 into 784x1
+	for (i = 0; i < 28; i++)
+	{
+		for (j = 0; j < 28; j++)
+		{
+			nn[i * 28 + j] = output[j][i];
+		}
+	}
+
 	NeuralNetwork();
 
-	//printf("%d", ROI[220][222]);
+	//for (i = 0; i < 784; i++)
+	//{
+	//	printf("%d\n", nn[i]);
+	//}
+
+	//int array[] = { 1, 2, 8, 2, 4, 6, 9 };
+	//int max = array[0];
+	//
+	////find the index of the 10x1 array
+	//for (i = 0; i < 7; ++i)
+	//{
+	//	if (array[i] > max)
+	//	{
+	//		max = array[i];
+	//		answer = i;
+	//	}
+	//}
+
+	printf("%d\n", answer);
+	//printf("%f\n", W1[14][1]);
+
 	//for (i = 0; i < 28; i++){
 	//	printf(" ");
-		printf("%d ", output[8][8]);
+	//
+	//	printf("%f ", answer);
 	//}
-	
+
+
+
+	//printing the image to file after the resize function
+
+	//FILE *fptr;
+	//fptr = fopen("./output.txt", "w");
+	//if (fptr == NULL)
+	//{
+	//	printf("ERROR!");
+	//	exit(1);
+	//}
+	//
+	//for (i = 0; i < 28; i++)
+	//{
+	//	for (j = 0; j < 28; j++)
+	//	{
+	//		fprintf(fptr, "%d\t", output[i][j]);
+	//	}
+	//	fprintf(fptr, "\n");
+	//}
+	//
+	//fclose(fptr);
+
+		free(ROI);
 	return 0;
 }
