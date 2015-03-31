@@ -1,5 +1,5 @@
-// converting roi.m to roi.c
-#pragma warning (disable : 4996)
+//C code without segmentation
+#pragma warning (disable : 4996) //add this to debug using visual studio in windows
 # include <stdio.h>
 # include <math.h>
 # include "img2.h"
@@ -43,7 +43,8 @@ void NeuralNetwork()
 	for (i = 0; i < 200; i++) 
 	{
 			sum = 0;
-			for (k = 0; k < 784; k++) {
+			for (k = 0; k < 784; k++)
+			{
 				sum = sum + W1[i][k] * nn[k];
 			}
 			Z1[i] = sum;
@@ -66,14 +67,14 @@ void NeuralNetwork()
 
 	//apply weight 2
 	//Multiplication Logic
-	for (i = 0; i < 200; i++) {
-	
+	for (i = 0; i < 200; i++) 
+	{
 			sum = 0;
-			for (k = 0; k < 200; k++) {
+			for (k = 0; k < 200; k++) 
+			{
 				sum = sum + W2[i][k] * Z1[k];
 			}
 			Z2[i] = sum;
-	
 	}
 
 	for (i = 0; i< 200; i++)
@@ -89,16 +90,17 @@ void NeuralNetwork()
 
 	//apply weight 3
 	//Multiplication Logic
-	for (i = 0; i < 10; i++) {
-	
+	for (i = 0; i < 10; i++)
+	{
 			sum = 0;
-			for (k = 0; k < 200; k++) {
+			for (k = 0; k < 200; k++) 
+			{
 				sum = sum + W3[i][k] * Z2[k];
 			}
 			Z3[i] = sum;
-		
 	}
 
+	//iterate through array and find the index of the max
 	int max = Z3[0];
 	
 	for (i = 0; i < 10; ++i)
@@ -109,6 +111,8 @@ void NeuralNetwork()
 			answer = i+1; //add one to the index because the index starts with 0
 		}
 	}
+
+	answer = answer % 10; //use MOD to take care of the 0 case
 
 	
 }
