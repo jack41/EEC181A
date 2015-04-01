@@ -2,7 +2,7 @@
 #pragma warning (disable : 4996) //add this to debug using visual studio in windows
 # include <stdio.h>
 # include <math.h>
-# include "img7.h"
+# include "img2.h"
 # include "demo.h"
 
 //int img [480][640];
@@ -23,61 +23,13 @@ int ROIimg[221][223];
 int output[28][28];
 int nn[784];
 
-//has the final answer
 double Z3[10];
 int answer=0;
 
-/******************************************************/
-//need this for the resize function
-int sizeCol;
-int sizeRow;
-int **ROI;
-
-void reSize()
-{
-	//find the height of the image;
-
-	int width = sizeCol;
-	int height = sizeRow;
-
-	//initialize the 2d array with 0
-	int i, j;
-	for (i = 0; i<28; i++)
-	{
-		for (j = 0; j<28; j++)
-		{
-			output[i][j] = 0;
-		}
-	}
-
-	//resize function
-	//value to store the index
-	int x;
-	int y;
-	for (i = 0; i<28; i++)
-	{
-		for (j = 0; j<28; j++)
-		{
-			//x = round((i - 1)*(height - 1) / (scaleHeight*height - 1) + 1);
-			//y = round((j - 1)*(width - 1) / (scaleWidth*width - 1) + 1);
-
-			x = round((i*(height - 1) / 27));
-			y = round((j*(width - 1) / 27));
-			//output will have the 28x28 dimensions of the image
-			output[i][j] = ROI[x][y];
-		}
-	}
-
-
-	//convert the 28x28 into 784x1
-	for (i = 0; i < 28; i++)
-	{
-		for (j = 0; j < 28; j++)
-		{
-			nn[i * 28 + j] = output[j][i]; //swap the j and i because matlab multiplys differently
-		}
-	}
-}
+//void resize(int width, int height, int )
+//{
+//
+//}
 
 void NeuralNetwork()
 {
@@ -175,6 +127,7 @@ int main(){
 		{
 			cols_Sum[cols] += img[rows][cols];
 		}
+		int y = 0;
 	}
 	
 	//hardcoding the value only work for this sample
@@ -188,7 +141,9 @@ int main(){
 		else
 		{
 			binary_cols_Sum[cols] = 0;
-		}	
+		}
+		int x = 0;
+		
 	}
 
 	//find the index that has 0
@@ -219,6 +174,7 @@ int main(){
 		{
 			rows_Sum[rows] += img[rows][cols];
 		}
+		int k = 0;
 	}
 
 	//base on the sum come up with binary to find the index
@@ -257,14 +213,14 @@ int main(){
 	}
 	
 	//use the index to get the region of interest
-	sizeCol = cols_index_end - cols_index_beg;
-	sizeRow = rows_index_end - rows_index_beg;
+	int sizeCol = cols_index_end - cols_index_beg;
+	int sizeRow = rows_index_end - rows_index_beg;
 
-	
+	int **ROI;
 	//dynamically allocate memory for ROI
 	ROI = (int **)malloc(sizeof(int *)*sizeRow);
 
-	// for each row, malloc space 
+	// for each row, malloc space for its buckets and add it to 
 	// the array of arrays
 	for (i = 0; i < sizeRow; i++) {
 		ROI[i] = (int *)malloc(sizeof(int)*sizeCol);
@@ -288,7 +244,58 @@ int main(){
 	}
 
 
-	reSize();
+	//find the height of the image;
+
+	int width = sizeCol;
+	int height = sizeRow;
+
+	//calculate the scale factor
+	double scaleWidth = (double)28 / width;
+	double scaleHeight = (double)28 / height;
+
+
+
+	//initialize the 2d array with 0
+	int i, j;
+	for (i = 0; i<28; i++)
+	{
+		for (j = 0; j<28; j++)
+		{
+			output[i][j] = 0;
+		}
+	}
+
+	//calculate the max index for the for loop
+	double widthMax = scaleWidth*width;
+	double heightMax = scaleHeight*height;
+
+	//resize function
+	//value to store the index
+	int x;
+	int y;
+	for (i = 0; i<28; i++)
+	{
+		for (j = 0; j<28; j++)
+		{
+			//x = round((i - 1)*(height - 1) / (scaleHeight*height - 1) + 1);
+			//y = round((j - 1)*(width - 1) / (scaleWidth*width - 1) + 1);
+
+			x = round((i*(height - 1) / 27));
+			y = round((j*(width - 1) / 27) );
+			//output will have the 28x28 dimensions of the image
+			output[i][j] = ROI[x][y];
+		}
+	}
+
+
+	//convert the 28x28 into 784x1
+	for (i = 0; i < 28; i++)
+	{
+		for (j = 0; j < 28; j++)
+		{
+			nn[i * 28 + j] = output[j][i]; //swap the j and i because matlab multiplys differently
+		}
+	}
 
 	NeuralNetwork(); //call the neural network function
 
