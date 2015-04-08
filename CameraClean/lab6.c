@@ -45,13 +45,12 @@ int main(){
 		//move the variables back inside main for the restart purpose
 		// Variables
 		int img [480][640];		// Array that holds image
-		int binary[480][640];	// Array that holds the binary version of the img
+		//int binary[480][640];	// Array that holds the binary version of the img
 		
 		int rows = 0;			// Indices for loops
 		int cols = 0;			// Indices for loops
 		
-		int line1_avg = 0;		// Average of the first line to get a good level for the binary
-		int binary_level = 0;	// The level for making the image binary = 5% less than the line1_avg
+	
 		
 		// Resize
 		int **ROI;
@@ -63,8 +62,6 @@ int main(){
 		int binary_rows_Sum[480] = { 0 };
 		int cols_Sum[640] = { 0 };
 		int binary_cols_Sum[640] = { 0 };
-		int rows_level = 0;
-		int cols_level = 0;
 		int rows_index_beg, rows_index_end;
 		int cols_index_beg, cols_index_end;
 		int i = 0, j = 0, k = 0;
@@ -75,6 +72,7 @@ int main(){
 		
 		double Z3[10];
 		int answer=0;
+		int tempAns=0;
 
 		
 		printf("Press Enter to begin\n ");
@@ -153,9 +151,6 @@ int main(){
 			}
 		}
 	}
-	
-	//check the value inside the img;
-	printf("%d\n", img[200][200]);
 	
 	
 	/*
@@ -287,8 +282,8 @@ int main(){
 	sizeRow = rows_index_end - rows_index_beg;
 
 	
-	printf("col beg: %d, col end: %d\n", cols_index_beg, cols_index_end);
-	printf("row beg: %d, row end: %d\n", rows_index_beg, rows_index_end);
+	//printf("col beg: %d, col end: %d\n", cols_index_beg, cols_index_end);
+	//printf("row beg: %d, row end: %d\n", rows_index_beg, rows_index_end);
 	
 	
 	//printf("%d\n", sizeCol);
@@ -346,32 +341,32 @@ int main(){
 	int y;
 	//int num_digits = round(roi_width / roi_height);
 	double roundNum=0;
-	roundNum=(sizeCol / sizeRow);
-	int num_digits=0;
-	
+	roundNum=(sizeCol*1.0 / sizeRow);
+	int num_digits=round(roundNum);
+	/*
 	if(roundNum<1.5)
 	{
 		num_digits = 1;
 	}
-	else if(roundNum<2)
+	else if(roundNum<2.2)
 	{
 		num_digits=2;
 	}
-	else if(roundNum<3)
+	else if(roundNum<3.2)
 	{
 		num_digits=3;
 	}
-	else if (roundNum<4)
+	else if (roundNum<4.2)
 	{
 		num_digits = 4;
-	}else if(roundNum<5)
+	}else if(roundNum<5.2)
 	{
 		num_digits = 5;
-	}else if(roundNum<6)
+	}else if(roundNum<6.2)
 	{
 		num_digits=6;
 	}
-	
+	*/
 	//int num_digits = round(roundNum);
 	printf("%d\n", roi_width);
 	printf("%d\n", roi_height);
@@ -416,7 +411,7 @@ int main(){
 			}
 		}
 		
-		
+		/*
 		printf("Print 28x28\n");
 		for (i = 0; i<28; i++)
 		{
@@ -429,7 +424,7 @@ int main(){
 			}
 			printf("\n");
 		}
-		
+		*/
 
 		//convert the 28x28 into 784x1
 		for (i = 0; i < 28; i++)
@@ -446,7 +441,7 @@ int main(){
 		//
 		// -----------------------------------------------------------------------------------
 		
-		printf("Start Neural Network\n");
+		//printf("Start Neural Network\n");
 		
 		double sum;
 		double Z1[200];
@@ -516,21 +511,22 @@ int main(){
 	
 		//iterate through array and find the index of the max
 		int max = Z3[0];
-		
+	
 		for (i = 0; i < 10; ++i)
 		{
 			if (Z3[i] > max)
 			{
 				max = Z3[i];
-				answer = i+1; //add one to the index because the index starts with 0
+				tempAns = i+1; //add one to the index because the index starts with 0
 			}
 		}
-	
-		answer = answer % 10; //use MOD to take care of the 0 case
 		
+		 answer = answer + pow(10.0, (num_digits-(z+1)))*(tempAns%10);
+		//answer = answer % 10; //use MOD to take care of the 0 case
 		printf("Digit #%d is %d\n", z+1, answer);
+		//printf("Digit #%d is %d\n", z+1, answer);
 	} // End segmentation for loop
-		
+	printf("The detected digits are: %d\n", answer);
 	printf("\nDone\n");
 	}
 	
